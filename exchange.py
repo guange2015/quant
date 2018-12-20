@@ -31,13 +31,11 @@ max_threshold = 100
 #### 全局变量
 g_datas = []
 g_index = 0
-g_tasks = []
 
 ##  函数定义
 def init():
     g_datas = []
     g_index = 0
-    g_tasks = []
 
 def progress(n,total):
     percent = round(1.0 * n / total * 100,2)
@@ -85,6 +83,16 @@ def get_maker_fee(exchange_name, symbol):
     return markets[symbol]['maker']
 
 
+def run_tasks_with_event_loop(tasks):
+    old_loop = asyncio.get_event_loop()
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+
+    asyncio.set_event_loop(old_loop)
+
 #主函数
 def start():
     init()
@@ -93,24 +101,18 @@ def start():
     print("提现手续费 %f" % withdraw_fee2)
     print("过滤阀值[%f, %f]" %(min_threshold, max_threshold))
 
-    for i in ccxt.exchanges:
-        try:
-            g_tasks.append(fetch_order_book(i))
-        except Exception as e:
-            # print(e)
-            pass
 
-    loop = asyncio.get_event_loop()
-    # 执行 coroutine
-    loop.run_until_complete(asyncio.wait(g_tasks))
-    loop.close()
+    tasks = []
+    for i in ccxt.exchanges:
+        tasks.append(fetch_order_book(i))
+    
+    run_tasks_with_event_loop(tasks)
 
     try:
         with open('/tmp/test_{0}.json'.format(now_time()), 'w+') as f:
             f.write(json.dumps(g_datas))
     except:
         print("write file error")
-        pass
 
     gf = None
     for i in g_datas:
@@ -158,5 +160,8 @@ def start():
     print('比值: %f' % (rate) )
 
 if __name__ == '__main__':
-    for i in range(3):
-        start()
+    while True:
+        try:
+            start()
+        except Exception as e:
+            print(e)
