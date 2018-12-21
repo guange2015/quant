@@ -3,3 +3,5 @@ venv/
 .ropeproject/
 .idea/
 data.csv
+key.json
+__pycache__/
