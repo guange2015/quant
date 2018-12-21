@@ -72,12 +72,29 @@ def now_time():
     return now
 
 
-def save_to_db(bid_exchange, ask_exchange, max_bid, min_ask, taker_fee, maker_fee, withdraw_fee1, withdraw_fee2, rate):
-    """保存到csv文件"""
+def save_to_db(bid_exchange, ask_exchange, max_bid, min_ask, taker_fee, maker_fee, _withdraw_fee1,
+               _withdraw_fee2,
+               rate):
+    """保存到csv文件
+    Args:
+        :param bid_exchange: 卖出的交易所
+        :param ask_exchange: 买的交易所
+        :param max_bid:  最高卖出价
+        :param min_ask:  最低买入价
+        :param taker_fee: 吃单手续费
+        :param maker_fee: 挂单手续费
+        :param _withdraw_fee1: 提取手续费1
+        :param _withdraw_fee2: 提取手续费2
+        :param rate: 比例
+
+    """
     f = open('data.csv', 'a+')
-    f.write("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}\n".format(now_time(), bid_exchange, ask_exchange, max_bid, min_ask,
-                                                               taker_fee, maker_fee, withdraw_fee1, withdraw_fee2,
-                                                               rate))
+    f.write(
+        "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}\n".format(now_time(), bid_exchange, ask_exchange,
+                                                           max_bid, min_ask,
+                                                           taker_fee, maker_fee, _withdraw_fee1,
+                                                           _withdraw_fee2,
+                                                           rate))
     f.close
 
 
@@ -161,7 +178,8 @@ def start():
     bid_exchange_name = max_bid.iloc[0]['exchange']
     ask_exchange_name = min_ask.iloc[0]['exchange']
 
-    save_to_db(bid_exchange_name, ask_exchange_name, max_for_sell, min_for_buy, taker_fee, maker_fee, withdraw_fee1,
+    save_to_db(bid_exchange_name, ask_exchange_name, max_for_sell, min_for_buy, taker_fee,
+               maker_fee, withdraw_fee1,
                withdraw_fee2, rate)
 
     print("最高卖出价%f 交易所 %s" % (max_for_sell, bid_exchange_name))
