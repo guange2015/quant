@@ -12,6 +12,8 @@ import logging
 
 
 # 可配置变量
+import notify
+
 proxies = {
     'http': 'http://127.0.0.1:1087',
     'https': 'https://127.0.0.1:1087',
@@ -122,9 +124,11 @@ def is_over_threshold():
 
 if __name__ == '__main__':
     init()
-    while True:
-        if is_over_threshold():
-            short()
-            break
-        time.sleep(5)
-
+    try:
+        while True:
+            if is_over_threshold():
+                short()
+                break
+            time.sleep(5)
+    finally:
+        notify.notify_by_dingding("平仓了，看看有没有赚到")
