@@ -14,14 +14,9 @@ import logging
 # 可配置变量
 import notify
 
-# proxies = {
-#     'http': 'http://127.0.0.1:1087',
-#     'https': 'https://127.0.0.1:1087',
-# }
-
 proxies = {
-    'http': 'socks5://127.0.0.1:1086',
-    'https': 'socks5://127.0.0.1:1086',
+    'http': 'http://127.0.0.1:1087',
+    'https': 'https://127.0.0.1:1087',
 }
 
 
