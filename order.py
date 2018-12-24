@@ -3,6 +3,9 @@ import json
 import time
 import ccxt
 import logging
+import argparse
+import os
+import configparser
 
 # 思路整理
 # 1. 手工买入
@@ -122,8 +125,27 @@ def is_over_threshold():
             return True
     return False
 
+def load_config():
+    global g_exchange_name
+    global g_symbol
+    global g_buy_price
+
+    dirpath = os.path.dirname(os.path.realpath(__file__))
+    cfg_path = os.path.join(dirpath, 'config.cfg')
+    if not os.path.exists(cfg_path):
+        print("找不到配置文件")
+        exit(0)
+
+    config = configparser.ConfigParser()
+    config.read(cfg_path)
+    g_exchange_name = config.get('exchange', 'name')
+    g_buy_price = config.getfloat('exchange', 'buy_price')
+    g_symbol = config.get('exchange', 'symbol')
+
+    print("交易所: {0} 交易对: {1}  买入价: {2}".format(g_exchange_name, g_symbol, g_buy_price))
 
 if __name__ == '__main__':
+    load_config()
     init()
     try:
         while True:
