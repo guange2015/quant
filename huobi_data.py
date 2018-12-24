@@ -86,3 +86,4 @@ if __name__ == '__main__':
             except Exception as e:
                 logging.error(e)
             time.sleep(10)
+        time.sleep(20)
