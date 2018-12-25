@@ -6,11 +6,11 @@
 ## 每30分钟采一次，period为1m
 
 import json
-import requests
-import time, datetime
-import os
 import logging
-import sys
+import os
+import time
+
+import requests
 
 api_key = None
 
