@@ -3,6 +3,7 @@ import time
 
 import engine
 from base import Base
+from notify import notify_by_dingding
 
 
 class Grid(Base):
@@ -25,10 +26,22 @@ class Grid(Base):
         price.     只有限价单时才用得着
         params  交易所自带的私有属性
         """
-        self.exchange.create_order(self.symbol, 'limit', 'sell', amount, price)
+        logging.debug("以%f价格卖出%f" % (price, amount))
+        try:
+            self.exchange.create_order(self.symbol, 'limit', 'sell', amount, price)
+            notify_by_dingding("以%f价格卖出" % price)
+        except Exception as e:
+            logging.error("卖出失败: ", e)
+            notify_by_dingding("卖出失败: {0}".format(e))
 
     def buy(self, amount, price):
-        self.exchange.create_order(self.symbol, 'limit', 'buy', amount, price)
+        logging.debug("以%f价格买入%f" % (price, amount))
+        try:
+            self.exchange.create_order(self.symbol, 'limit', 'buy', amount, price)
+            notify_by_dingding("以%f价格买入" % price)
+        except Exception as e:
+            logging.error("买入失败: ", e)
+            notify_by_dingding("买入失败: {0}".format(e))
 
     def get_current_price(self):
         """监控市价
@@ -103,5 +116,9 @@ class BackToTestGrid(engine.Engine):
 if __name__ == '__main__':
     grid = Grid('huobipro', 'BCH/USDT')
     while True:
-        grid.run()
-        time.sleep(3)
+        try:
+            grid.run()
+            time.sleep(3)
+        except Exception as e:
+            notify_by_dingding("运行异常: {0}".format(e))
+            exit(0)
