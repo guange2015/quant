@@ -1,4 +1,7 @@
+import configparser
+import json
 import logging
+import os
 import time
 
 import engine
@@ -7,11 +10,18 @@ from notify import notify_by_dingding
 
 
 class Grid(Base):
-
-    def __init__(self, exchange_name, symbol):
+    def __init__(self):
+        config = self.load_config()
+        exchange_name = config.get('grid', 'name')
+        symbol = config.get('grid', 'symbol')
         super(Grid, self).__init__(exchange_name, symbol)
-        self.base_line = 150.0  # 当前价格基准线
-        self.one_hand = 0.2  # 一手买多少
+        self.base_line = config.getfloat('grid', 'base_line')  # 当前价格基准线
+        self.one_hand = config.getfloat('grid', 'one_hand')  # 一手买多少
+
+        logging.info("交易所：%s" % exchange_name)
+        logging.info("交易对：%s" % symbol)
+        logging.info("基线：%f" % self.base_line)
+        logging.info("一格：%f" % self.one_hand)
 
     def sell(self, amount, price):
         """
@@ -84,11 +94,23 @@ class Grid(Base):
         logging.info("bch: {0}".format(balances['BCH']))
 
     def test(self):
-        print(self.exchange.fetchBalance())
-        orders = self.exchange.fetch_order_book(self.symbol, limit=1)
-        print(orders)
-        print(self.get_current_price())
-        self.print_account_info()
+        self.save_config(100.0)
+
+    @staticmethod
+    def load_config():
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        cfg_path = os.path.join(dir_path, 'config.cfg')
+        if not os.path.exists(cfg_path):
+            raise Exception("找不到配置文件")
+        config = configparser.ConfigParser()
+        config.read(cfg_path)
+        return config
+
+    def save_config(self, base_line):
+        config = self.load_config()
+        config.set('grid', 'base_line', str(base_line))
+        with open('config.cfg', 'w') as f:
+            config.write(f)
 
 
 class BackToTestGrid(engine.Engine):
@@ -114,11 +136,14 @@ class BackToTestGrid(engine.Engine):
 
 
 if __name__ == '__main__':
-    grid = Grid('huobipro', 'BCH/USDT')
+    grid = Grid()
     while True:
         try:
             grid.run()
             time.sleep(3)
+        except TimeoutError as time_e:
+            logging.error("超时异常: {0}".format(e))
         except Exception as e:
+            logging.error("运行异常: {0}".format(e))
             notify_by_dingding("运行异常: {0}".format(e))
             exit(0)
