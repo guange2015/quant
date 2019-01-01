@@ -77,6 +77,10 @@ class Grid(Base):
         # 获取当前价格
         self.print_account_info()
         max_bid, min_ask = self.get_current_price()
+        if max_bid <=0 or min_ask<=0:
+            logging.info("获取价格失败")
+            return
+
         rate1 = (self.base_line - min_ask) / self.base_line * 100
         rate2 = (max_bid - self.base_line) / self.base_line * 100
         logging.info("当前基线:%f, 最高买价:%f[%f]，最低卖价:%f[%f]"
