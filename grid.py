@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import time
+import traceback
 
 from urllib3.exceptions import ReadTimeoutError
 
@@ -77,7 +78,7 @@ class Grid(Base):
         # 获取当前价格
         self.print_account_info()
         max_bid, min_ask = self.get_current_price()
-        if max_bid <=0 or min_ask<=0:
+        if max_bid <= 0 or min_ask <= 0:
             logging.info("获取价格失败")
             return
 
@@ -102,9 +103,9 @@ class Grid(Base):
     def test(self):
         self.save_config(100.0)
 
-    def set_base_line(self,base_line):
+    def set_base_line(self, base_line):
         self.base_line = base_line
-        config.write_value('grid','base_line',str(base_line))
+        config.write_value('grid', 'base_line', str(base_line))
 
 
 class BackToTestGrid(engine.Engine):
@@ -138,6 +139,6 @@ if __name__ == '__main__':
         except ReadTimeoutError as time_e:
             logging.error("超时异常: {0}".format(time_e))
         except Exception as e:
-            logging.error("运行异常: {0}".format(e))
+            logging.error("运行异常: {0}".format(traceback.format_exc()))
             notify_by_dingding("运行异常: {0}".format(e))
             exit(0)
