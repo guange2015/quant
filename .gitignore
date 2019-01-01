@@ -5,3 +5,4 @@ venv/
 data.csv
 key.json
 __pycache__/
+config.cfg

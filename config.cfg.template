@@ -5,7 +5,7 @@ symbol = BCH/USDT
 
 [grid]
 name = huobipro
-base_line = 157.9
+base_line = 157.590000
 symbol = BCH/USDT
 one_hand=0.2
 
