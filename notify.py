@@ -1,10 +1,13 @@
-#coding=utf-8
+# coding=utf-8
 
 # 通知功能
 
 import requests
 
-_DING_NOTIFY_URL = 'https://oapi.dingtalk.com/robot/send?access_token=dfb3f45fdd33d3456d955871095121b985476b6016030ebb948bbe15e4a05aca'
+import config
+
+_DING_NOTIFY_URL = 'https://oapi.dingtalk.com/robot/send?access_token=' \
+                   + config.get_string('notify', 'ding_token')
 
 
 def notify_by_dingding(msg):

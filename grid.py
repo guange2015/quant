@@ -4,19 +4,21 @@ import logging
 import os
 import time
 
+from urllib3.exceptions import ReadTimeoutError
+
 import engine
 from base import Base
 from notify import notify_by_dingding
+import config
 
 
 class Grid(Base):
     def __init__(self):
-        config = self.load_config()
-        exchange_name = config.get('grid', 'name')
-        symbol = config.get('grid', 'symbol')
+        exchange_name = config.get_string('grid', 'name')
+        symbol = config.get_string('grid', 'symbol')
         super(Grid, self).__init__(exchange_name, symbol)
-        self.base_line = config.getfloat('grid', 'base_line')  # 当前价格基准线
-        self.one_hand = config.getfloat('grid', 'one_hand')  # 一手买多少
+        self.base_line = config.get_float('grid', 'base_line')  # 当前价格基准线
+        self.one_hand = config.get_float('grid', 'one_hand')  # 一手买多少
 
         logging.info("交易所：%s" % exchange_name)
         logging.info("交易对：%s" % symbol)
@@ -96,21 +98,9 @@ class Grid(Base):
     def test(self):
         self.save_config(100.0)
 
-    @staticmethod
-    def load_config():
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        cfg_path = os.path.join(dir_path, 'config.cfg')
-        if not os.path.exists(cfg_path):
-            raise Exception("找不到配置文件")
-        config = configparser.ConfigParser()
-        config.read(cfg_path)
-        return config
-
-    def save_config(self, base_line):
-        config = self.load_config()
-        config.set('grid', 'base_line', str(base_line))
-        with open('config.cfg', 'w') as f:
-            config.write(f)
+    def set_base_line(self,base_line):
+        self.base_line = base_line
+        config.write_value('grid','base_line',str(base_line))
 
 
 class BackToTestGrid(engine.Engine):
@@ -141,8 +131,8 @@ if __name__ == '__main__':
         try:
             grid.run()
             time.sleep(3)
-        except TimeoutError as time_e:
-            logging.error("超时异常: {0}".format(e))
+        except ReadTimeoutError as time_e:
+            logging.error("超时异常: {0}".format(time_e))
         except Exception as e:
             logging.error("运行异常: {0}".format(e))
             notify_by_dingding("运行异常: {0}".format(e))
