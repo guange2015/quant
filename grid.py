@@ -86,11 +86,11 @@ class Grid(Base):
         # 如果比基准价格下降 5%, 购买一股
         if rate1 >= 5.0:
             self.buy(self.one_hand, min_ask)
-            self.base_line = min_ask
+            self.set_base_line(min_ask)
         # 如果比基准价格高 5%, 抛出一股
         if rate2 >= 5.0:
             self.sell(self.one_hand, max_bid)
-            self.base_line = max_bid
+            self.set_base_line(max_bid)
 
     def print_account_info(self):
         balances = self.account_info()
