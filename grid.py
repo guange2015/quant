@@ -39,6 +39,7 @@ class Grid(Base):
         logging.debug("以%f价格卖出%f" % (price, amount))
         try:
             self.exchange.create_order(self.symbol, 'limit', 'sell', amount, price)
+            self.set_base_line(price)
             notify_by_dingding("以%f价格卖出" % price)
         except Exception as e:
             logging.error("卖出失败: ", e)
@@ -48,6 +49,7 @@ class Grid(Base):
         logging.debug("以%f价格买入%f" % (price, amount))
         try:
             self.exchange.create_order(self.symbol, 'limit', 'buy', amount, price)
+            self.set_base_line(price)
             notify_by_dingding("以%f价格买入" % price)
         except Exception as e:
             logging.error("买入失败: ", e)
@@ -86,11 +88,9 @@ class Grid(Base):
         # 如果比基准价格下降 5%, 购买一股
         if rate1 >= 5.0:
             self.buy(self.one_hand, min_ask)
-            self.set_base_line(min_ask)
         # 如果比基准价格高 5%, 抛出一股
         if rate2 >= 5.0:
             self.sell(self.one_hand, max_bid)
-            self.set_base_line(max_bid)
 
     def print_account_info(self):
         balances = self.account_info()
