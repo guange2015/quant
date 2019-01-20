@@ -8,6 +8,7 @@ import config
 import engine
 from base import Base
 from notify import notify_by_dingding
+from urllib3.exceptions import ProxyError
 
 
 class Grid(Base):
@@ -42,7 +43,7 @@ class Grid(Base):
             self.set_base_line(price)
             notify_by_dingding("以%f价格卖出" % price)
         except Exception as e:
-            logging.error("卖出失败: ", e)
+            logging.error("卖出失败: {}".format(e))
             notify_by_dingding("卖出失败: {0}".format(e))
 
     def buy(self, amount, price):
@@ -52,7 +53,7 @@ class Grid(Base):
             self.set_base_line(price)
             notify_by_dingding("以%f价格买入" % price)
         except Exception as e:
-            logging.error("买入失败: ", e)
+            logging.error("买入失败: {}".format(e))
             notify_by_dingding("买入失败: {0}".format(e))
 
     def get_current_price(self):
@@ -97,9 +98,6 @@ class Grid(Base):
         logging.info("usdt: {0}".format(balances['USDT']))
         logging.info("bch: {0}".format(balances['BCH']))
 
-    def test(self):
-        self.save_config(100.0)
-
     def set_base_line(self, base_line):
         self.base_line = base_line
         config.write_value('grid', 'base_line', str(base_line))
@@ -135,6 +133,8 @@ if __name__ == '__main__':
             time.sleep(3)
         except RequestTimeout as time_e:
             logging.error("超时异常: {0}".format(time_e))
+        except ProxyError as e:
+            logging.error("代理异常: {0}".format(e)) 
         except Exception as e:
             logging.error("运行异常: {0}".format(traceback.format_exc()))
             notify_by_dingding("运行异常: {0}".format(e))
