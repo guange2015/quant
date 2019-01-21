@@ -138,4 +138,3 @@ if __name__ == '__main__':
         except Exception as e:
             logging.error("运行异常: {0}".format(traceback.format_exc()))
             notify_by_dingding("运行异常: {0}".format(e))
-            exit(0)
